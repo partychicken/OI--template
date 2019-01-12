@@ -1,0 +1,95 @@
+template<typename T>
+class SEG
+{
+    public:
+        void modify(int l,int r,T val)
+        {
+            modify(root,1,n,l,r,val);
+        }
+
+        T query(int l,int r)
+        {
+            return query(root,1,n,l,r);
+        }
+
+        SEG()
+        {
+            root=new Node();
+        }
+
+    private:
+        struct Node
+        {
+            Node *ls,*rs;
+            T sum,add;
+            Node():ls(0),rs(0),sum(0),add(0){}
+        };
+        Node *root;
+
+        void update(Node *now)
+        {
+            now->sum=0;
+            if(now->ls)
+            {
+                now->sum+=now->ls->sum;
+            }
+            if(now->rs)
+            {
+                now->sum+=now->rs->sum;
+            }
+        }
+
+        void pushdown(Node *now,int len)
+        {
+            if(!now->ls)
+            {
+                now->ls=new Node();
+            }
+            if(!now->rs)
+            {
+                now->rs=new Node();
+            }
+            if(now->add)
+            {
+                now->ls->add+=now->add;
+                now->rs->add+=now->add;
+                now->ls->sum+=now->add*(len-(len>>1));
+                now->rs->sum+=now->add*(len>>1);
+                now->add=(T)0;
+            }
+        }
+
+        void modify(Node *now,int nl,int nr,int gl,int gr,T val)
+        {
+            if(nl>gr||nr<gl)
+            {
+                return;
+            }
+            if(nl>=gl&&nr<=gr)
+            {
+                now->add+=val;
+                now->sum+=val*(nr-nl+1);
+                return;
+            }
+            pushdown(now,nr-nl+1);
+            int mid=nl+nr>>1;
+            modify(now->ls,nl,mid,gl,gr,val);
+            modify(now->rs,mid+1,nr,gl,gr,val);
+            update(now);
+        }
+
+        T query(Node *now,int nl,int nr,int gl,int gr)
+        {
+            if(nl>gr||nr<gl)
+            {
+                return (T)0;
+            }
+            if(nl>=gl&&nr<=gr)
+            {
+                return now->sum;
+            }
+            pushdown(now,nr-nl+1);
+            int mid=nl+nr>>1;
+            return query(now->ls,nl,mid,gl,gr)+query(now->rs,mid+1,nr,gl,gr);
+        }
+};
