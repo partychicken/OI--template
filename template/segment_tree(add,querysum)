@@ -61,10 +61,7 @@ class SEG
 
         void modify(Node *now,int nl,int nr,int gl,int gr,T val)
         {
-            if(nl>gr||nr<gl)
-            {
-                return;
-            }
+            if(nl>gr||nr<gl) return;
             if(nl>=gl&&nr<=gr)
             {
                 now->add+=val;
@@ -80,14 +77,8 @@ class SEG
 
         T query(Node *now,int nl,int nr,int gl,int gr)
         {
-            if(nl>gr||nr<gl)
-            {
-                return (T)0;
-            }
-            if(nl>=gl&&nr<=gr)
-            {
-                return now->sum;
-            }
+            if(nl>gr||nr<gl) return (T)0;
+            if(nl>=gl&&nr<=gr) return now->sum;
             pushdown(now,nr-nl+1);
             int mid=nl+nr>>1;
             return query(now->ls,nl,mid,gl,gr)+query(now->rs,mid+1,nr,gl,gr);
