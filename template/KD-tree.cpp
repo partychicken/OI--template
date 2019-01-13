@@ -6,20 +6,22 @@ const int N=100010;
 
 int wd;
 
+struct Point
+{
+    int x[2],w;
+
+    bool operator<(const Point &b)const
+    {
+        return x[wd]<b.x[wd];
+    }
+};
+
 class KDT
 {
     private:
         int top,cur,rub[N];
 
-        struct Point
-        {
-            int x[2],w;
-
-            bool operator<(const Point &b)const
-            {
-                return x[wd]<b.x[wd];
-            }
-        }p[N];
+        Point p[N];
 
         struct Node
         {
@@ -100,18 +102,18 @@ class KDT
             }
         }
 
-        bool in(int x1,int y1,int x2,int y2,int xx1,int yy1,int xx2,int yy2)
+        bool in(int x,int y,int a,int b,int c)
         {
-            return (xx1>=x1&&xx2<=x2&&yy1>=y1&&yy2<=y2);
+            return a*x+b*y<c;
         }
 
-        bool out(int x1,int y1,int x2,int y2,int xx1,int yy1,int xx2,int yy2)
+        bool out(int x,int y,int a,int b,int c)
         {
-            return (x1>xx2||x2<xx1||y1>yy2||y2<yy1);
+            return a*x+b*y>=c;
         }
     public:
         int root;
-    
+
         void ins(int &k,Point tmp,int ww)
         {
             if(!k)
@@ -134,26 +136,49 @@ class KDT
             check(k,ww);
         }
 
-        int query(int k,int x1,int y1,int x2,int y2)
+        int query(int k,int a,int b,int c)
         {
             if(!k)
             {
                 return 0;
             }
             int res=0;
-            if(in(x1,y1,x2,y2,tr[k].mn[0],tr[k].mn[1],tr[k].mx[0],tr[k].mx[1]))
-            {
-                return tr[k].sum;
-            }
-            if(out(x1,y1,x2,y2,tr[k].mn[0],tr[k].mn[1],tr[k].mx[0],tr[k].mx[1]))
+            int tmp=0;
+            tmp+=in(tr[k].mx[0],tr[k].mx[1],a,b,c);
+            tmp+=in(tr[k].mn[0],tr[k].mx[1],a,b,c);
+            tmp+=in(tr[k].mx[0],tr[k].mn[1],a,b,c);
+            tmp+=in(tr[k].mn[0],tr[k].mn[1],a,b,c);
+            if(!tmp)
             {
                 return 0;
             }
-            if(in(x1,y1,x2,y2,tr[k].tp.x[0],tr[k].tp.x[1],tr[k].tp.x[0],tr[k].tp.x[1]))
+            if(tmp==4)
+            {
+                return tr[k].sum;
+            }
+            if(in(tr[k].tp.x[0],tr[k].tp.x[1],a,b,c))
             {
                 res+=tr[k].tp.w;
             }
-            res+=query(tr[k].ls,x1,y1,x2,y2)+query(tr[k].rs,x1,y1,x2,y2);
+            res+=query(tr[k].ls,a,b,c)+query(tr[k].rs,a,b,c);
             return res;
         }
 }a;
+
+main()
+{
+    int n,m;
+    cin>>n>>m;
+    for(int i=1;i<=n;i++)
+    {
+        int x,y,w;
+        cin>>x>>y>>w;
+        a.ins(a.root,(Point){x,y,w},0);
+    }
+    for(int i=1;i<=m;i++)
+    {
+        int sa,sb,sc;
+        cin>>sa>>sb>>sc;
+        cout<<a.query(a.root,sa,sb,sc)<<'\n';
+    }
+}
