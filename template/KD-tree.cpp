@@ -9,7 +9,7 @@ int wd;
 class KDT
 {
     private:
-        int n,ans,root,top,cur,rub[N];
+        int top,cur,rub[N];
 
         struct Point
         {
@@ -110,6 +110,8 @@ class KDT
             return (x1>xx2||x2<xx1||y1>yy2||y2<yy1);
         }
     public:
+        int root;
+    
         void ins(int &k,Point tmp,int ww)
         {
             if(!k)
