@@ -1,0 +1,70 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+class PA
+{
+    private:
+        struct Node
+        {
+            int len,cnt;
+            Node *ptr[26];
+            Node *fail;
+            Node(int,Node*);
+        };
+
+        Node *rootodd,*rooteven;
+        Node::Node(int len,Node *fail=rooteven):len(len),fail(fail),cnt(0)
+        {
+            for(int i=0;i<26;i++)
+            {
+                ptr[i]=rooteven;
+            }
+        }
+
+        Node *getfail(Node *x,int pos)
+        {
+            while(s[pos-x->len-1]!=s[pos])
+            {
+                x=x->fail;
+            }
+            return x;
+        }
+
+    public:
+        string s;
+
+        Node *topo[300010];
+        int cnt;
+
+        PA()
+        {
+            rooteven=new Node(0,rootodd);
+            rootodd=new Node(-1,rooteven);
+            for(int i=0;i<26;i++)
+            {
+                rooteven->ptr[i]=rooteven;
+            }
+            rooteven->fail=rootodd;
+        }
+
+        void insert()
+        {
+            Node *cur=rooteven;
+            Node *now;
+            int len=s.size();
+            for(int i=0;i<len;i++)
+            {
+                now=getfail(cur,i);
+                if(now->ptr[s[i]-'a']==rooteven)
+                {
+                    Node *tmp=new Node((now->len)+2);
+                    topo[++cnt]=tmp;
+                    tmp->fail=getfail(now->fail,i)->ptr[s[i]-'a'];
+                    now->ptr[s[i]-'a']=tmp;
+                }
+                cur=now->ptr[s[i]-'a'];
+                cur->cnt++;
+            }
+        }
+};
