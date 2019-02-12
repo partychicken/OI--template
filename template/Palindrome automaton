@@ -1,70 +1,54 @@
-#include<bits/stdc++.h>
-
-using namespace std;
-
 class PA
 {
     private:
         struct Node
         {
-            int len,cnt;
-            Node *ptr[26];
-            Node *fail;
-            Node(int,Node*);
-        };
-
-        Node *rootodd,*rooteven;
-        Node::Node(int len,Node *fail=rooteven):len(len),fail(fail),cnt(0)
-        {
-            for(int i=0;i<26;i++)
+            int len;
+            int ptr[26],fail;
+            Node(int len=0):len(len),fail(0)
             {
-                ptr[i]=rooteven;
+                memset(ptr,0,sizeof(ptr));
             }
-        }
+        }nd[100010];
+        int size,cnt;
+        char s[100010];
 
-        Node *getfail(Node *x,int pos)
+        int getfail(int x)
         {
-            while(s[pos-x->len-1]!=s[pos])
+            while(s[size-nd[x].len-1]!=s[size])
             {
-                x=x->fail;
+                x=nd[x].fail;
             }
             return x;
         }
 
     public:
-        string s;
-
-        Node *topo[300010];
-        int cnt;
-
-        PA()
+        int cur;
+        PA():size(0),cnt(0),cur(0)
         {
-            rooteven=new Node(0,rootodd);
-            rootodd=new Node(-1,rooteven);
-            for(int i=0;i<26;i++)
-            {
-                rooteven->ptr[i]=rooteven;
-            }
-            rooteven->fail=rootodd;
+            nd[cnt]=Node(0);
+            nd[cnt].fail=1;
+            nd[++cnt]=Node(-1);
+            nd[cnt].fail=0;
+            s[0]='$';
         }
 
-        void insert()
+        void extend(char c)
         {
-            Node *cur=rooteven;
-            Node *now;
-            int len=s.size();
-            for(int i=0;i<len;i++)
+            s[++size]=c;
+            int now=getfail(cur);
+            if(!nd[now].ptr[c-'a'])
             {
-                now=getfail(cur,i);
-                if(now->ptr[s[i]-'a']==rooteven)
-                {
-                    Node *tmp=new Node((now->len)+2);
-                    topo[++cnt]=tmp;
-                    tmp->fail=getfail(now->fail,i)->ptr[s[i]-'a'];
-                    now->ptr[s[i]-'a']=tmp;
-                }
-                cur=now->ptr[s[i]-'a'];
-                cur->cnt++;
+                int tmp=++cnt;
+                nd[tmp]=Node(nd[now].len+2);
+                nd[tmp].fail=nd[getfail(nd[now].fail)].ptr[c-'a'];
+                nd[now].ptr[c-'a']=tmp;
             }
+            cur=nd[now].ptr[c-'a'];
         }
-};
+
+        int qlen()
+        {
+            return nd[cur].len;
+        }
+}A,B;
