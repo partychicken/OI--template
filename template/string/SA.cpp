@@ -80,7 +80,6 @@ struct SA
     }
 
     int minn[500010][22];
-    long long s[500010];
 
     void pre()
     {
@@ -96,10 +95,6 @@ struct SA
             {
                 minn[i][j]=min(minn[i][j-1],minn[i+(1<<j-1)][j-1]);
             }
-        }
-        for(int i=1;i<=n;i++)
-        {
-            s[i]=s[i-1]+n-sa[i]+1-height[i];
         }
     }
 
