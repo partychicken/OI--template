@@ -1,0 +1,108 @@
+struct LCT
+{
+    struct Node
+    {
+        int w,tag;
+        int son[2];
+        int fa;
+    }nd[1200050];
+
+    void add(int pos,int val)
+    {
+        if(pos)
+        {
+            nd[pos].w+=val;
+            nd[pos].tag+=val;
+        }
+    }
+
+    void pushdown(int now)
+    {
+        int ls=nd[now].son[0],rs=nd[now].son[1];
+        if(nd[now].tag)
+        {
+            add(ls,nd[now].tag);
+            add(rs,nd[now].tag);
+            nd[now].tag=0;
+        }
+    }
+
+    bool isroot(int now)
+    {
+        int fa=nd[now].fa;
+        return nd[fa].son[0]!=now&&nd[fa].son[1]!=now;
+    }
+
+    void rotate(int now)
+    {
+        int fa=nd[now].fa,anc=nd[fa].fa;
+        int _id=nd[fa].son[0]==now,id=_id^1;
+        if(!isroot(fa))
+        {
+            if(nd[anc].son[0]==fa)
+            {
+                nd[anc].son[0]=now;
+            }
+            else
+            {
+                nd[anc].son[1]=now;
+            }
+        }
+        nd[now].fa=anc;
+        nd[fa].fa=now;
+        nd[nd[now].son[_id]].fa=fa;
+        nd[fa].son[id]=nd[now].son[_id];
+        nd[now].son[_id]=fa;
+    }
+
+    int st[1200010];
+    void splay(int now)
+    {
+        int cnt=0;
+        st[++cnt]=now;
+        for(int i=now;!isroot(i);i=nd[i].fa)
+        {
+            st[++cnt]=nd[i].fa;
+        }
+        while(cnt)
+        {
+            pushdown(st[cnt--]);
+        }
+        while(!isroot(now))
+        {
+            int fa=nd[now].fa,anc=nd[fa].fa;
+            if(!isroot(fa))
+            {
+                rotate((nd[fa].son[0]==now)^(nd[anc].son[0]==fa)?now:fa);
+            }
+            rotate(now);
+        }
+    }
+
+    void access(int now)
+    {
+        for(int last=0;now;now=nd[now].fa)
+        {
+            splay(now);
+            nd[now].son[1]=last;
+            last=now;
+        }
+    }
+
+    void link(int x,int y)
+    {
+        nd[x].fa=y;
+        access(y);
+        splay(y);
+        add(y,nd[x].w);
+    }
+
+    void cut(int now)
+    {
+        access(now);
+        splay(now);
+        add(nd[now].son[0],-nd[now].w);
+        nd[nd[now].son[0]].fa=0;
+        nd[now].son[0]=0;
+    }
+}s;
