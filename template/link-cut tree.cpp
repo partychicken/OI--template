@@ -42,10 +42,6 @@ struct LCT
         fa[child[now][_id]]=nfa;
         child[nfa][id]=child[now][_id];
         child[now][_id]=nfa;
-        if(fa[now]==now)
-        {
-            cout<<"fuck\n"<<endl;
-        }
         update(nfa);
         update(now);
     }
@@ -79,10 +75,6 @@ struct LCT
         {
             splay(now);
             child[now][1]=last;
-            if(last)
-            {
-                fa[last]=now;
-            }
             update(now);
             last=now;
         }
