@@ -1,58 +1,76 @@
-#include<bits/stdc++.h>
-
-using namespace std;
-
-struct Node
+struct SAM
 {
-    int len,link;
-    map<char,int>nxt;
-}nd[3000010];
-
-int sz(0),last(1);
-
-void init()
-{
-    nd[1].len=0;
-    nd[1].link=0;
-    ++sz;
-}
-
-string s;
-
-void extend(char c)
-{
-    int cur=++sz;
-    nd[cur].len=nd[last].len+1;
-    int p=last;
-    while(p&&!nd[p].nxt.count(c))
+    struct Node
     {
-        nd[p].nxt[c]=cur;
-        p=nd[p].link;
-    }
-    if(p==0)
-    {
-        nd[cur].link=1;
-    }
-    else
-    {
-        int q=nd[p].nxt[c];
-        if(nd[p].len+1==nd[q].len)
+        int link,ptr[26];
+        int len;
+
+        Node():link(0),len(0)
         {
-            nd[cur].link=q;
+            memset(ptr,0,sizeof(ptr));
+        }
+
+        Node(int link,int len):link(link),len(len)
+        {
+            memset(ptr,0,sizeof(ptr));
+        }
+    }nd[100010];
+    int cnt,last;
+
+    SAM():cnt(1),last(1){}
+
+    void extend(int x)
+    {
+        int now=++cnt;
+        nd[now].len=nd[last].len+1;
+        int p=last;
+        while(p&&!nd[p].ptr[x])
+        {
+            nd[p].ptr[x]=now;
+            p=nd[p].link;
+        }
+        if(!p)
+        {
+            nd[now].link=1;
         }
         else
         {
-            int clone=++sz;
-            nd[clone].len=nd[p].len+1;
-            nd[clone].nxt=nd[q].nxt;
-            nd[clone].link=nd[q].link;
-            while(p&&nd[p].nxt[c]==q)
+            int q=nd[p].ptr[x];
+            if(nd[p].len+1==nd[q].len)
             {
-                nd[p].nxt[c]=clone;
-                p=nd[p].link;
+                nd[now].link=q;
             }
-            nd[q].link=nd[cur].link=clone;
+            else
+            {
+                int clone=++cnt;
+                nd[clone]=Node(nd[q].link,nd[p].len+1);
+                memcpy(nd[clone].ptr,nd[q].ptr,sizeof(nd[clone].ptr));
+                while(p&&nd[p].ptr[x]==q)
+                {
+                    nd[p].ptr[x]=clone;
+                    p=nd[p].link;
+                }
+                nd[q].link=nd[now].link=clone;
+            }
+        }
+        last=now;
+    }
+
+    int tax[100010],topo[100010];
+
+    void gettop()
+    {
+        for(int i=1;i<=cnt;i++)
+        {
+            tax[nd[i].len]++;
+        }
+        for(int i=1;i<=cnt;i++)
+        {
+            tax[i]+=tax[i-1];
+        }
+        for(int i=1;i<=cnt;i++)
+        {
+            topo[tax[nd[i].len]--]=i;
         }
     }
-    last=cur;
-}
+}A;
